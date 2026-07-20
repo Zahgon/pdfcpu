@@ -1,34 +1,13 @@
-/*
-Copyright 2021 The pdfcpu Authors.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-	http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package model
 
 import (
-	"fmt"
-	"time"
-
 	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/color"
 	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/types"
-	"github.com/pkg/errors"
 )
 
-// AnnotationFlags represents the PDF annotation flags.
 type AnnotationFlags int
 
-const ( // See table 165
+const (
 	AnnInvisible AnnotationFlags = 1 << iota
 	AnnHidden
 	AnnPrint
@@ -41,7 +20,6 @@ const ( // See table 165
 	AnnLockedContents
 )
 
-// AnnotationType represents the various PDF annotation types.
 type AnnotationType int
 
 const (
@@ -104,7 +82,6 @@ var AnnotTypes = map[string]AnnotationType{
 	"Custom":         AnnCustom,
 }
 
-// AnnotTypeStrings manages string representations for annotation types.
 var AnnotTypeStrings = map[AnnotationType]string{
 	AnnText:           "Text",
 	AnnLink:           "Link",
@@ -135,7 +112,6 @@ var AnnotTypeStrings = map[AnnotationType]string{
 	AnnCustom:         "Custom",
 }
 
-// BorderStyle (see table 168)
 type BorderStyle int
 
 const (
@@ -147,48 +123,20 @@ const (
 )
 
 func borderStyleDict(width float64, style BorderStyle) types.Dict {
-	d := types.Dict(map[string]types.Object{
-		"Type": types.Name("Border"),
-		"W":    types.Float(width),
-	})
-
-	var s string
-
-	switch style {
-	case BSSolid:
-		s = "S"
-	case BSDashed:
-		s = "D"
-	case BSBeveled:
-		s = "B"
-	case BSInset:
-		s = "I"
-	case BSUnderline:
-		s = "U"
-	}
-
-	d["S"] = types.Name(s)
-
-	return d
+	_ = "STUB: not implemented"
+	return *new(types.Dict)
 }
 
 func borderEffectDict(cloudyBorder bool, intensity int) types.Dict {
-	s := "S"
-	if cloudyBorder {
-		s = "C"
-	}
-
-	return types.Dict(map[string]types.Object{
-		"S": types.Name(s),
-		"I": types.Integer(intensity),
-	})
+	_ = "STUB: not implemented"
+	return *new(types.Dict)
 }
 
 func borderArray(rx, ry, width float64) types.Array {
-	return types.NewNumberArray(rx, ry, width)
+	_ = "STUB: not implemented"
+	return *new(types.Array)
 }
 
-// LineEndingStyle (see table 179)
 type LineEndingStyle int
 
 const (
@@ -204,35 +152,8 @@ const (
 	LESlash
 )
 
-// LineEndingStyleName line ending style name.
-func LineEndingStyleName(les LineEndingStyle) string {
-	var s string
-	switch les {
-	case LESquare:
-		s = "Square"
-	case LECircle:
-		s = "Circle"
-	case LEDiamond:
-		s = "Diamond"
-	case LEOpenArrow:
-		s = "OpenArrow"
-	case LEClosedArrow:
-		s = "ClosedArrow"
-	case LENone:
-		s = "None"
-	case LEButt:
-		s = "Butt"
-	case LEROpenArrow:
-		s = "ROpenArrow"
-	case LERClosedArrow:
-		s = "RClosedArrow"
-	case LESlash:
-		s = "Slash"
-	}
-	return s
-}
+func LineEndingStyleName(les LineEndingStyle) string { _ = "STUB: not implemented"; return "" }
 
-// AnnotationRenderer is the interface for PDF annotations.
 type AnnotationRenderer interface {
 	RenderDict(xRefTable *XRefTable, pageIndRef *types.IndirectRef) (types.Dict, error)
 	Type() AnnotationType
@@ -245,27 +166,23 @@ type AnnotationRenderer interface {
 	CustomTypeString() string
 }
 
-// Annotation represents a PDF annotation.
 type Annotation struct {
-	SubType          AnnotationType     // The type of annotation that this dictionary describes.
-	CustomSubType    string             // Out of spec annot type.
-	Rect             types.Rectangle    // The annotation rectangle, defining the location of the annotation on the page in default user space units.
-	APObjNr          int                // The objNr of the appearance stream dict.
-	Contents         string             // Text that shall be displayed for the annotation.
-	NM               string             // (Since V1.4) The annotation name, a text string uniquely identifying it among all the annotations on its page.
-	ModificationDate string             // M - The date and time when the annotation was most recently modified.
-	P                *types.IndirectRef // An indirect reference to the page object with which this annotation is associated.
-	F                AnnotationFlags    // A set of flags specifying various characteristics of the annotation.
-	C                *color.SimpleColor // The background color of the annotation’s icon when closed, pop up title bar color, link ann border color.
-	BorderRadX       float64            // Border radius X
-	BorderRadY       float64            // Border radius Y
-	BorderWidth      float64            // Border width
+	SubType          AnnotationType
+	CustomSubType    string
+	Rect             types.Rectangle
+	APObjNr          int
+	Contents         string
+	NM               string
+	ModificationDate string
+	P                *types.IndirectRef
+	F                AnnotationFlags
+	C                *color.SimpleColor
+	BorderRadX       float64
+	BorderRadY       float64
+	BorderWidth      float64
 	Hash             uint32
-	// StructParent int
-	// OC types.dict
 }
 
-// NewAnnotation returns a new annotation.
 func NewAnnotation(
 	typ AnnotationType,
 	customTyp string,
@@ -278,24 +195,10 @@ func NewAnnotation(
 	borderRadX float64,
 	borderRadY float64,
 	borderWidth float64) Annotation {
-
-	return Annotation{
-		SubType:          typ,
-		CustomSubType:    customTyp,
-		Rect:             rect,
-		APObjNr:          apObjNr,
-		Contents:         contents,
-		NM:               id,
-		ModificationDate: modDate,
-		F:                f,
-		C:                col,
-		BorderRadX:       borderRadX,
-		BorderRadY:       borderRadY,
-		BorderWidth:      borderWidth,
-	}
+	_ = "STUB: not implemented"
+	return *new(Annotation)
 }
 
-// NewAnnotationForRawType returns a new annotation of a specific type.
 func NewAnnotationForRawType(
 	typ string,
 	rect types.Rectangle,
@@ -308,124 +211,44 @@ func NewAnnotationForRawType(
 	borderRadX float64,
 	borderRadY float64,
 	borderWidth float64) Annotation {
-
-	annType, ok := AnnotTypes[typ]
-	if !ok {
-		annType = AnnotTypes["Custom"]
-	} else {
-		typ = ""
-	}
-
-	return NewAnnotation(annType, typ, rect, apObjNr, contents, id, modDate, f, col, borderRadX, borderRadY, borderWidth)
+	_ = "STUB: not implemented"
+	return *new(Annotation)
 }
 
-// ID returns the annotation id.
-func (ann Annotation) ID() string {
-	return ann.NM
-}
+func (ann Annotation) ID() string { _ = "STUB: not implemented"; return "" }
 
-// ContentString returns a string representation of ann's contents.
-func (ann Annotation) ContentString() string {
-	return ann.Contents
-}
+func (ann Annotation) ContentString() string { _ = "STUB: not implemented"; return "" }
 
-// Content returns ann's contents.
-func (ann Annotation) Content() string {
-	return ann.Contents
-}
+func (ann Annotation) Content() string { _ = "STUB: not implemented"; return "" }
 
-// CustomTypeString returns a string representation of ann's contents.
-func (ann Annotation) CustomTypeString() string {
-	return ann.CustomSubType
-}
+func (ann Annotation) CustomTypeString() string { _ = "STUB: not implemented"; return "" }
 
-// RectString returns ann's positioning rectangle.
-func (ann Annotation) RectString() string {
-	return ann.Rect.ShortString()
-}
+func (ann Annotation) RectString() string { _ = "STUB: not implemented"; return "" }
 
-// Rectangle returns ann's positioning rectangle.
 func (ann Annotation) Rectangle() types.Rectangle {
-	return ann.Rect
+	_ = "STUB: not implemented"
+	return *new(types.Rectangle)
 }
 
-// APObjNrInt returns APObjnr.
-func (ann Annotation) APObjNrInt() int {
-	return ann.APObjNr
-}
+func (ann Annotation) APObjNrInt() int { _ = "STUB: not implemented"; return 0 }
 
-// Type returns ann's type.
-func (ann Annotation) Type() AnnotationType {
-	return ann.SubType
-}
+func (ann Annotation) Type() AnnotationType { _ = "STUB: not implemented"; return *new(AnnotationType) }
 
-// TypeString returns a string representation of ann's type.
-func (ann Annotation) TypeString() string {
-	return AnnotTypeStrings[ann.SubType]
-}
+func (ann Annotation) TypeString() string { _ = "STUB: not implemented"; return "" }
 
-// HashString returns the annotation hash.
-func (ann Annotation) HashString() uint32 {
-	return ann.Hash
-}
+func (ann Annotation) HashString() uint32 { _ = "STUB: not implemented"; return 0 }
 
-// RenderDict renders ann as dict.
 func (ann Annotation) RenderDict(xRefTable *XRefTable, pageIndRef *types.IndirectRef) (types.Dict, error) {
-	d := types.Dict(map[string]types.Object{
-		"Type":    types.Name("Annot"),
-		"Subtype": types.Name(ann.TypeString()),
-		"Rect":    ann.Rect.Array(),
-	})
-
-	if pageIndRef != nil {
-		d["P"] = *pageIndRef
-	}
-
-	if ann.Contents != "" {
-		s, err := types.EscapedUTF16String(ann.Contents)
-		if err != nil {
-			return nil, err
-		}
-		d.InsertString("Contents", *s)
-	}
-
-	if ann.NM != "" {
-		d.InsertString("NM", ann.NM)
-	}
-
-	modDate := types.DateString(time.Now())
-	if ann.ModificationDate != "" {
-		_, ok := types.DateTime(ann.ModificationDate, xRefTable.ValidationMode == ValidationRelaxed)
-		if !ok {
-			return nil, errors.Errorf("pdfcpu: annotation renderDict - validateDateEntry: <%s> invalid date", ann.ModificationDate)
-		}
-		modDate = ann.ModificationDate
-	}
-	d.InsertString("ModDate", modDate)
-
-	if ann.F != 0 {
-		d["F"] = types.Integer(ann.F)
-	}
-
-	if ann.C != nil {
-		d["C"] = ann.C.Array()
-	}
-
-	if ann.BorderWidth > 0 {
-		d["Border"] = borderArray(ann.BorderRadX, ann.BorderRadY, ann.BorderWidth)
-	}
-
-	return d, nil
+	_ = "STUB: not implemented"
+	return *new(types.Dict), nil
 }
 
-// PopupAnnotation represents PDF Popup annotations.
 type PopupAnnotation struct {
 	Annotation
-	ParentIndRef *types.IndirectRef // The optional parent markup annotation with which this pop-up annotation shall be associated.
-	Open         bool               // A flag specifying whether the annotation shall initially be displayed open.
+	ParentIndRef *types.IndirectRef
+	Open         bool
 }
 
-// NewPopupAnnotation returns a new popup annotation.
 func NewPopupAnnotation(
 	rect types.Rectangle,
 	apObjNr int,
@@ -439,53 +262,27 @@ func NewPopupAnnotation(
 
 	parentIndRef *types.IndirectRef,
 	displayOpen bool) PopupAnnotation {
-
-	ann := NewAnnotation(AnnPopup, "", rect, apObjNr, contents, id, modDate, f, col, borderRadX, borderRadY, borderWidth)
-
-	return PopupAnnotation{
-		Annotation:   ann,
-		ParentIndRef: parentIndRef,
-		Open:         displayOpen,
-	}
+	_ = "STUB: not implemented"
+	return *new(PopupAnnotation)
 }
 
-// ContentString returns a string representation of ann's content.
-func (ann PopupAnnotation) ContentString() string {
-	s := "\"" + ann.Contents + "\""
-	if ann.ParentIndRef != nil {
-		s = "-> #" + ann.ParentIndRef.ObjectNumber.String()
-	}
-	return s
-}
+func (ann PopupAnnotation) ContentString() string { _ = "STUB: not implemented"; return "" }
 
-// RenderDict renders ann as dict.
 func (ann PopupAnnotation) RenderDict(xRefTable *XRefTable, pageIndRef *types.IndirectRef) (types.Dict, error) {
-	d, err := ann.Annotation.RenderDict(xRefTable, pageIndRef)
-	if err != nil {
-		return nil, err
-	}
-
-	if ann.ParentIndRef != nil {
-		d["Parent"] = *ann.ParentIndRef
-	}
-
-	d["Open"] = types.Boolean(ann.Open)
-
-	return d, nil
+	_ = "STUB: not implemented"
+	return *new(types.Dict), nil
 }
 
-// LinkAnnotation represents a PDF link annotation.
 type LinkAnnotation struct {
 	Annotation
-	Dest        *Destination     // internal link
-	URI         string           // external link
-	Quad        types.QuadPoints // shall be ignored if any coordinate lies outside the region specified by Rect.
-	Border      bool             // render border using borderColor.
+	Dest        *Destination
+	URI         string
+	Quad        types.QuadPoints
+	Border      bool
 	BorderWidth float64
 	BorderStyle BorderStyle
 }
 
-// NewLinkAnnotation returns a new link annotation.
 func NewLinkAnnotation(
 	rect types.Rectangle,
 	apObjNr int,
@@ -494,102 +291,33 @@ func NewLinkAnnotation(
 	f AnnotationFlags,
 	borderCol *color.SimpleColor,
 
-	dest *Destination, // supply dest or uri, dest takes precedence
+	dest *Destination,
 	uri string,
 	quad types.QuadPoints,
 	border bool,
 	borderWidth float64,
 	borderStyle BorderStyle) LinkAnnotation {
-
-	ann := NewAnnotation(AnnLink, "", rect, apObjNr, contents, id, modDate, f, borderCol, 0, 0, 0)
-
-	return LinkAnnotation{
-		Annotation:  ann,
-		Dest:        dest,
-		URI:         uri,
-		Quad:        quad,
-		Border:      border,
-		BorderWidth: borderWidth,
-		BorderStyle: borderStyle,
-	}
+	_ = "STUB: not implemented"
+	return *new(LinkAnnotation)
 }
 
-// ContentString returns a string representation of ann's content.
-func (ann LinkAnnotation) ContentString() string {
-	if len(ann.URI) > 0 {
-		return ann.URI
-	}
-	if ann.Dest != nil {
-		// eg. page /XYZ left top zoom
-		return fmt.Sprintf("Page %d %s", ann.Dest.PageNr, ann.Dest)
-	}
-	return "internal link"
-}
+func (ann LinkAnnotation) ContentString() string { _ = "STUB: not implemented"; return "" }
 
-// RenderDict renders ann into a page annotation dict.
 func (ann LinkAnnotation) RenderDict(xRefTable *XRefTable, pageIndRef *types.IndirectRef) (types.Dict, error) {
-	d, err := ann.Annotation.RenderDict(xRefTable, pageIndRef)
-	if err != nil {
-		return nil, err
-	}
-
-	if ann.Dest != nil {
-		dest := ann.Dest
-		if dest.Zoom == 0 {
-			dest.Zoom = 1
-		}
-		_, indRef, pAttr, err := xRefTable.PageDict(dest.PageNr, false)
-		if err != nil {
-			return nil, err
-		}
-		if dest.Typ == DestXYZ && dest.Left < 0 && dest.Top < 0 {
-			// Show top left corner of destination page.
-			dest.Left = int(pAttr.MediaBox.LL.X)
-			dest.Top = int(pAttr.MediaBox.UR.Y)
-			if pAttr.CropBox != nil {
-				dest.Left = int(pAttr.CropBox.LL.X)
-				dest.Top = int(pAttr.CropBox.UR.Y)
-			}
-		}
-		d["Dest"] = dest.Array(*indRef)
-	} else {
-		actionDict := types.Dict(map[string]types.Object{
-			"Type": types.Name("Action"),
-			"S":    types.Name("URI"),
-			"URI":  types.StringLiteral(ann.URI),
-		})
-		d["A"] = actionDict
-	}
-
-	if ann.Quad != nil {
-		d.Insert("QuadPoints", ann.Quad.Array())
-	}
-
-	if !ann.Border {
-		d["Border"] = types.NewIntegerArray(0, 0, 0)
-	} else {
-		if ann.C != nil {
-			d["C"] = ann.C.Array()
-		}
-	}
-
-	d["BS"] = borderStyleDict(ann.BorderWidth, ann.BorderStyle)
-
-	return d, nil
+	_ = "STUB: not implemented"
+	return *new(types.Dict), nil
 }
 
-// MarkupAnnotation represents a PDF markup annotation.
 type MarkupAnnotation struct {
 	Annotation
-	T            string             // The text label that shall be displayed in the title bar of the annotation’s pop-up window when open and active. This entry shall identify the user who added the annotation.
-	PopupIndRef  *types.IndirectRef // An indirect reference to a pop-up annotation for entering or editing the text associated with this annotation.
-	CA           *float64           // (Default: 1.0) The constant opacity value that shall be used in painting the annotation.
-	RC           string             // A rich text string that shall be displayed in the pop-up window when the annotation is opened.
-	CreationDate string             // The date and time when the annotation was created.
-	Subj         string             // Text representing a short description of the subject being addressed by the annotation.
+	T            string
+	PopupIndRef  *types.IndirectRef
+	CA           *float64
+	RC           string
+	CreationDate string
+	Subj         string
 }
 
-// NewMarkupAnnotation returns a new markup annotation.
 func NewMarkupAnnotation(
 	subType AnnotationType,
 	rect types.Rectangle,
@@ -606,80 +334,23 @@ func NewMarkupAnnotation(
 	popupIndRef *types.IndirectRef,
 	ca *float64,
 	rc, subject string) MarkupAnnotation {
-
-	ann := NewAnnotation(subType, "", rect, apObjNr, contents, id, modDate, f, col, borderRadX, borderRadY, borderWidth)
-
-	return MarkupAnnotation{
-		Annotation:   ann,
-		T:            title,
-		PopupIndRef:  popupIndRef,
-		CA:           ca,
-		RC:           rc,
-		CreationDate: types.DateString(time.Now()),
-		Subj:         subject}
+	_ = "STUB: not implemented"
+	return *new(MarkupAnnotation)
 }
 
-// ContentString returns a string representation of ann's content.
-func (ann MarkupAnnotation) ContentString() string {
-	s := "\"" + ann.Contents + "\""
-	if ann.PopupIndRef != nil {
-		s += "-> #" + ann.PopupIndRef.ObjectNumber.String()
-	}
-	return s
-}
+func (ann MarkupAnnotation) ContentString() string { _ = "STUB: not implemented"; return "" }
 
-// RenderDict renders ann as dict.
 func (ann MarkupAnnotation) RenderDict(xRefTable *XRefTable, pageIndRef *types.IndirectRef) (types.Dict, error) {
-	d, err := ann.Annotation.RenderDict(xRefTable, pageIndRef)
-	if err != nil {
-		return nil, err
-	}
-
-	if ann.T != "" {
-		s, err := types.EscapedUTF16String(ann.T)
-		if err != nil {
-			return nil, err
-		}
-		d.InsertString("T", *s)
-	}
-
-	if ann.PopupIndRef != nil {
-		d.Insert("Popup", *ann.PopupIndRef)
-	}
-
-	if ann.CA != nil {
-		d.Insert("CA", types.Float(*ann.CA))
-	}
-
-	if ann.RC != "" {
-		s, err := types.EscapedUTF16String(ann.RC)
-		if err != nil {
-			return nil, err
-		}
-		d.InsertString("RC", *s)
-	}
-
-	d.InsertString("CreationDate", ann.CreationDate)
-
-	if ann.Subj != "" {
-		s, err := types.EscapedUTF16String(ann.Subj)
-		if err != nil {
-			return nil, err
-		}
-		d.InsertString("Subj", *s)
-	}
-
-	return d, nil
+	_ = "STUB: not implemented"
+	return *new(types.Dict), nil
 }
 
-// TextAnnotation represents a PDF text annotation aka "Sticky Note".
 type TextAnnotation struct {
 	MarkupAnnotation
-	Open bool   // A flag specifying whether the annotation shall initially be displayed open.
-	Name string // The name of an icon that shall be used in displaying the annotation. Comment, Key, (Note), Help, NewParagraph, Paragraph, Insert
+	Open bool
+	Name string
 }
 
-// NewTextAnnotation returns a new text annotation.
 func NewTextAnnotation(
 	rect types.Rectangle,
 	apObjNr int,
@@ -697,33 +368,15 @@ func NewTextAnnotation(
 
 	displayOpen bool,
 	name string) TextAnnotation {
-
-	ma := NewMarkupAnnotation(AnnText, rect, apObjNr, contents, id, modDate, f, col, borderRadX, borderRadY, borderWidth, title, popupIndRef, ca, rc, subject)
-
-	return TextAnnotation{
-		MarkupAnnotation: ma,
-		Open:             displayOpen,
-		Name:             name,
-	}
+	_ = "STUB: not implemented"
+	return *new(TextAnnotation)
 }
 
-// RenderDict renders ann into a PDF annotation dict.
 func (ann TextAnnotation) RenderDict(xRefTable *XRefTable, pageIndRef *types.IndirectRef) (types.Dict, error) {
-	d, err := ann.MarkupAnnotation.RenderDict(xRefTable, pageIndRef)
-	if err != nil {
-		return nil, err
-	}
-
-	d["Open"] = types.Boolean(ann.Open)
-
-	if ann.Name != "" {
-		d.InsertName("Name", ann.Name)
-	}
-
-	return d, nil
+	_ = "STUB: not implemented"
+	return *new(types.Dict), nil
 }
 
-// FreeTextIntent represents the various free text annotation intents.
 type FreeTextIntent int
 
 const (
@@ -732,45 +385,26 @@ const (
 	IntentFreeTextTypeWriter
 )
 
-// FreeTextIntentName returns the string representation for ft.
-func FreeTextIntentName(fti FreeTextIntent) string {
-	var s string
-	switch fti {
-	case IntentFreeText:
-		s = "FreeText"
-	case IntentFreeTextCallout:
-		s = "FreeTextCallout"
-	case IntentFreeTextTypeWriter:
-		s = "FreeTextTypeWriter"
-	}
-	return s
-}
+func FreeTextIntentName(fti FreeTextIntent) string { _ = "STUB: not implemented"; return "" }
 
-// FreeText Annotation displays text directly on the page.
 type FreeTextAnnotation struct {
 	MarkupAnnotation
-	Text                   string             // Rich text string, see XFA 3.3
-	HAlign                 types.HAlignment   // Code specifying the form of quadding (justification)
-	FontName               string             // font name
-	FontSize               int                // font size
-	FontCol                *color.SimpleColor // font color
-	DS                     string             // Default style string
-	Intent                 string             // Description of the intent of the free text annotation
-	CallOutLine            types.Array        // if intent is FreeTextCallout
+	Text                   string
+	HAlign                 types.HAlignment
+	FontName               string
+	FontSize               int
+	FontCol                *color.SimpleColor
+	DS                     string
+	Intent                 string
+	CallOutLine            types.Array
 	CallOutLineEndingStyle string
 	Margins                types.Array
 	BorderWidth            float64
 	BorderStyle            BorderStyle
 	CloudyBorder           bool
-	CloudyBorderIntensity  int // 0,1,2
+	CloudyBorderIntensity  int
 }
 
-// XFA conform rich text string examples:
-// The<b> second </b>and<span style="font-weight:bold"> fourth </span> words are bold.
-// The<i> second </i>and<span style="font-style:italic"> fourth </span> words are italicized.
-// For more information see <a href="http://www.example.com/">this</a> web site.
-
-// NewFreeTextAnnotation returns a new free text annotation.
 func NewFreeTextAnnotation(
 	rect types.Rectangle,
 	apObjNr int,
@@ -797,118 +431,15 @@ func NewFreeTextAnnotation(
 	borderStyle BorderStyle,
 	cloudyBorder bool,
 	cloudyBorderIntensity int) FreeTextAnnotation {
-
-	// validate required DA, DS
-
-	// validate callOutline: 2 or 3 points => array of 4 or 6 numbers.
-
-	ma := NewMarkupAnnotation(AnnFreeText, rect, apObjNr, contents, id, modDate, f, col, 0, 0, 0, title, popupIndRef, ca, rc, subject)
-
-	if cloudyBorderIntensity < 0 || cloudyBorderIntensity > 2 {
-		cloudyBorderIntensity = 0
-	}
-
-	freeTextIntent := ""
-	if intent != nil {
-		freeTextIntent = FreeTextIntentName(*intent)
-	}
-
-	leStyle := ""
-	if callOutLineEndingStyle != nil {
-		leStyle = LineEndingStyleName(*callOutLineEndingStyle)
-	}
-
-	freeTextAnn := FreeTextAnnotation{
-		MarkupAnnotation:       ma,
-		Text:                   text,
-		HAlign:                 hAlign,
-		FontName:               fontName,
-		FontSize:               fontSize,
-		FontCol:                fontCol,
-		DS:                     ds,
-		Intent:                 freeTextIntent,
-		CallOutLine:            callOutLine,
-		CallOutLineEndingStyle: leStyle,
-		BorderWidth:            borderWidth,
-		BorderStyle:            borderStyle,
-		CloudyBorder:           cloudyBorder,
-		CloudyBorderIntensity:  cloudyBorderIntensity,
-	}
-
-	if MLeft > 0 || MTop > 0 || MRight > 0 || MBot > 0 {
-		freeTextAnn.Margins = types.NewNumberArray(MLeft, MTop, MRight, MBot)
-	}
-
-	return freeTextAnn
+	_ = "STUB: not implemented"
+	return *new(FreeTextAnnotation)
 }
 
-// RenderDict renders ann into a PDF annotation dict.
 func (ann FreeTextAnnotation) RenderDict(xRefTable *XRefTable, pageIndRef *types.IndirectRef) (types.Dict, error) {
-	d, err := ann.MarkupAnnotation.RenderDict(xRefTable, pageIndRef)
-	if err != nil {
-		return nil, err
-	}
-
-	da := ""
-
-	// TODO Implement Tf operator
-
-	// fontID, err := xRefTable.EnsureFont(ann.FontName) // in root page Resources?
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// da := fmt.Sprintf("/%s %d Tf", fontID, ann.FontSize)
-
-	if ann.FontCol != nil {
-		da += fmt.Sprintf(" %.2f %.2f %.2f rg", ann.FontCol.R, ann.FontCol.G, ann.FontCol.B)
-	}
-	d["DA"] = types.StringLiteral(da)
-
-	d.InsertInt("Q", int(ann.HAlign))
-
-	if ann.Text == "" {
-		if ann.Contents == "" {
-			return nil, errors.New("pdfcpu: FreeTextAnnotation missing \"text\"")
-		}
-		ann.Text = ann.Contents
-	}
-	s, err := types.EscapedUTF16String(ann.Text)
-	if err != nil {
-		return nil, err
-	}
-	d.InsertString("RC", *s)
-
-	if ann.DS != "" {
-		d.InsertString("DS", ann.DS)
-	}
-
-	if ann.Intent != "" {
-		d.InsertName("IT", ann.Intent)
-		if ann.Intent == "FreeTextCallout" {
-			if len(ann.CallOutLine) > 0 {
-				d["CL"] = ann.CallOutLine
-				d.InsertName("LE", ann.CallOutLineEndingStyle)
-			}
-		}
-	}
-
-	if ann.Margins != nil {
-		d["RD"] = ann.Margins
-	}
-
-	if ann.BorderWidth > 0 {
-		d["BS"] = borderStyleDict(ann.BorderWidth, ann.BorderStyle)
-	}
-
-	if ann.CloudyBorder && ann.CloudyBorderIntensity > 0 {
-		d["BE"] = borderEffectDict(ann.CloudyBorder, ann.CloudyBorderIntensity)
-	}
-
-	return d, nil
+	_ = "STUB: not implemented"
+	return *new(types.Dict), nil
 }
 
-// LineIntent represents the various line annotation intents.
 type LineIntent int
 
 const (
@@ -916,30 +447,19 @@ const (
 	IntentLineDimension
 )
 
-// LineIntentName returns the string representation for li.
-func LineIntentName(li LineIntent) string {
-	var s string
-	switch li {
-	case IntentLineArrow:
-		s = "LineArrow"
-	case IntentLineDimension:
-		s = "LineDimension"
-	}
-	return s
-}
+func LineIntentName(li LineIntent) string { _ = "STUB: not implemented"; return "" }
 
-// LineAnnotation represents a line annotation.
 type LineAnnotation struct {
 	MarkupAnnotation
-	P1, P2                    types.Point // Two points in default user space.
-	LineEndings               types.Array // Optional array of two names that shall specify the line ending styles.
-	LeaderLineLength          float64     // Length of leader lines in default user space that extend from each endpoint of the line perpendicular to the line itself.
-	LeaderLineOffset          float64     // Non-negative number that shall represent the length of the leader line offset, which is the amount of empty space between the endpoints of the annotation and the beginning of the leader lines.
-	LeaderLineExtensionLength float64     // Non-negative number that shall represents the length of leader line extensions that extend from the line proper 180 degrees from the leader lines,
-	Intent                    string      // Optional description of the intent of the line annotation.
-	Measure                   types.Dict  // Optional measure dictionary that shall specify the scale and units that apply to the line annotation.
-	Caption                   bool        // Use text specified by "Contents" or "RC" as caption.
-	CaptionPositionTop        bool        // if true the caption shall be on top of the line else caption shall be centred inside the line.
+	P1, P2                    types.Point
+	LineEndings               types.Array
+	LeaderLineLength          float64
+	LeaderLineOffset          float64
+	LeaderLineExtensionLength float64
+	Intent                    string
+	Measure                   types.Dict
+	Caption                   bool
+	CaptionPositionTop        bool
 	CaptionOffsetX            float64
 	CaptionOffsetY            float64
 	FillCol                   *color.SimpleColor
@@ -947,7 +467,6 @@ type LineAnnotation struct {
 	BorderStyle               BorderStyle
 }
 
-// NewLineAnnotation returns a new line annotation.
 func NewLineAnnotation(
 	rect types.Rectangle,
 	apObjNr int,
@@ -975,117 +494,17 @@ func NewLineAnnotation(
 	fillCol *color.SimpleColor,
 	borderWidth float64,
 	borderStyle BorderStyle) LineAnnotation {
-
-	ma := NewMarkupAnnotation(AnnLine, rect, apObjNr, contents, id, modDate, f, col, 0, 0, 0, title, popupIndRef, ca, rc, subject)
-
-	lineIntent := ""
-	if intent != nil {
-		lineIntent = LineIntentName(*intent)
-	}
-
-	lineAnn := LineAnnotation{
-		MarkupAnnotation:          ma,
-		P1:                        p1,
-		P2:                        p2,
-		LeaderLineLength:          leaderLineLength,
-		LeaderLineOffset:          leaderLineOffset,
-		LeaderLineExtensionLength: leaderLineExtensionLength,
-		Intent:                    lineIntent,
-		Measure:                   measure,
-		Caption:                   caption,
-		CaptionPositionTop:        captionPosTop,
-		CaptionOffsetX:            captionOffsetX,
-		CaptionOffsetY:            captionOffsetY,
-		FillCol:                   fillCol,
-		BorderWidth:               borderWidth,
-		BorderStyle:               borderStyle,
-	}
-
-	if beginLineEndingStyle != nil && endLineEndingStyle != nil {
-		lineAnn.LineEndings =
-			types.NewNameArray(
-				LineEndingStyleName(*beginLineEndingStyle),
-				LineEndingStyleName(*endLineEndingStyle),
-			)
-	}
-
-	return lineAnn
+	_ = "STUB: not implemented"
+	return *new(LineAnnotation)
 }
 
-func (ann LineAnnotation) validateLeaderLineAttrs() error {
-	if ann.LeaderLineExtensionLength < 0 {
-		return errors.New("pdfcpu: LineAnnotation leader line extension length must not be negative.")
-	}
+func (ann LineAnnotation) validateLeaderLineAttrs() error { _ = "STUB: not implemented"; return nil }
 
-	if ann.LeaderLineExtensionLength > 0 && ann.LeaderLineLength == 0 {
-		return errors.New("pdfcpu: LineAnnotation leader line length missing.")
-	}
-
-	if ann.LeaderLineOffset < 0 {
-		return errors.New("pdfcpu: LineAnnotation leader line offset must not be negative.")
-	}
-
-	return nil
-}
-
-// RenderDict renders ann into a PDF annotation dict.
 func (ann LineAnnotation) RenderDict(xRefTable *XRefTable, pageIndRef *types.IndirectRef) (types.Dict, error) {
-
-	d, err := ann.MarkupAnnotation.RenderDict(xRefTable, pageIndRef)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := ann.validateLeaderLineAttrs(); err != nil {
-		return nil, err
-	}
-
-	d["L"] = types.NewNumberArray(ann.P1.X, ann.P1.Y, ann.P2.X, ann.P2.Y)
-
-	if ann.LeaderLineExtensionLength > 0 {
-		d["LLE"] = types.Float(ann.LeaderLineExtensionLength)
-	}
-
-	if ann.LeaderLineLength > 0 {
-		d["LL"] = types.Float(ann.LeaderLineLength)
-		if ann.LeaderLineOffset > 0 {
-			d["LLO"] = types.Float(ann.LeaderLineOffset)
-		}
-	}
-
-	if len(ann.Measure) > 0 {
-		d["Measure"] = ann.Measure
-	}
-
-	if ann.Intent != "" {
-		d.InsertName("IT", ann.Intent)
-
-	}
-
-	d["Cap"] = types.Boolean(ann.Caption)
-	if ann.Caption {
-		if ann.CaptionPositionTop {
-			d["CP"] = types.Name("Top")
-		}
-		d["CO"] = types.NewNumberArray(ann.CaptionOffsetX, ann.CaptionOffsetY)
-	}
-
-	if ann.FillCol != nil {
-		d["IC"] = ann.FillCol.Array()
-	}
-
-	if ann.BorderWidth > 0 {
-		d["BS"] = borderStyleDict(ann.BorderWidth, ann.BorderStyle)
-	}
-
-	if len(ann.LineEndings) == 2 {
-		d["LE"] = ann.LineEndings
-	}
-
-	return d, nil
+	_ = "STUB: not implemented"
+	return *new(types.Dict), nil
 }
 
-// SquareAnnotation represents a square annotation.
 type SquareAnnotation struct {
 	MarkupAnnotation
 	FillCol               *color.SimpleColor
@@ -1093,10 +512,9 @@ type SquareAnnotation struct {
 	BorderWidth           float64
 	BorderStyle           BorderStyle
 	CloudyBorder          bool
-	CloudyBorderIntensity int // 0,1,2
+	CloudyBorderIntensity int
 }
 
-// NewSquareAnnotation returns a new square annotation.
 func NewSquareAnnotation(
 	rect types.Rectangle,
 	apObjNr int,
@@ -1115,56 +533,15 @@ func NewSquareAnnotation(
 	borderStyle BorderStyle,
 	cloudyBorder bool,
 	cloudyBorderIntensity int) SquareAnnotation {
-
-	ma := NewMarkupAnnotation(AnnSquare, rect, apObjNr, contents, id, modDate, f, col, 0, 0, 0, title, popupIndRef, ca, rc, subject)
-
-	if cloudyBorderIntensity < 0 || cloudyBorderIntensity > 2 {
-		cloudyBorderIntensity = 0
-	}
-
-	squareAnn := SquareAnnotation{
-		MarkupAnnotation:      ma,
-		FillCol:               fillCol,
-		BorderWidth:           borderWidth,
-		BorderStyle:           borderStyle,
-		CloudyBorder:          cloudyBorder,
-		CloudyBorderIntensity: cloudyBorderIntensity,
-	}
-
-	if MLeft > 0 || MTop > 0 || MRight > 0 || MBot > 0 {
-		squareAnn.Margins = types.NewNumberArray(MLeft, MTop, MRight, MBot)
-	}
-
-	return squareAnn
+	_ = "STUB: not implemented"
+	return *new(SquareAnnotation)
 }
 
-// RenderDict renders ann into a page annotation dict.
 func (ann SquareAnnotation) RenderDict(xRefTable *XRefTable, pageIndRef *types.IndirectRef) (types.Dict, error) {
-	d, err := ann.MarkupAnnotation.RenderDict(xRefTable, pageIndRef)
-	if err != nil {
-		return nil, err
-	}
-
-	if ann.FillCol != nil {
-		d["IC"] = ann.FillCol.Array()
-	}
-
-	if ann.Margins != nil {
-		d["RD"] = ann.Margins
-	}
-
-	if ann.BorderWidth > 0 {
-		d["BS"] = borderStyleDict(ann.BorderWidth, ann.BorderStyle)
-	}
-
-	if ann.CloudyBorder && ann.CloudyBorderIntensity > 0 {
-		d["BE"] = borderEffectDict(ann.CloudyBorder, ann.CloudyBorderIntensity)
-	}
-
-	return d, nil
+	_ = "STUB: not implemented"
+	return *new(types.Dict), nil
 }
 
-// CircleAnnotation represents a square annotation.
 type CircleAnnotation struct {
 	MarkupAnnotation
 	FillCol               *color.SimpleColor
@@ -1172,10 +549,9 @@ type CircleAnnotation struct {
 	BorderWidth           float64
 	BorderStyle           BorderStyle
 	CloudyBorder          bool
-	CloudyBorderIntensity int // 0,1,2
+	CloudyBorderIntensity int
 }
 
-// NewCircleAnnotation returns a new circle annotation.
 func NewCircleAnnotation(
 	rect types.Rectangle,
 	apObjNr int,
@@ -1194,56 +570,15 @@ func NewCircleAnnotation(
 	borderStyle BorderStyle,
 	cloudyBorder bool,
 	cloudyBorderIntensity int) CircleAnnotation {
-
-	ma := NewMarkupAnnotation(AnnCircle, rect, apObjNr, contents, id, modDate, f, col, 0, 0, 0, title, popupIndRef, ca, rc, subject)
-
-	if cloudyBorderIntensity < 0 || cloudyBorderIntensity > 2 {
-		cloudyBorderIntensity = 0
-	}
-
-	circleAnn := CircleAnnotation{
-		MarkupAnnotation:      ma,
-		FillCol:               fillCol,
-		BorderWidth:           borderWidth,
-		BorderStyle:           borderStyle,
-		CloudyBorder:          cloudyBorder,
-		CloudyBorderIntensity: cloudyBorderIntensity,
-	}
-
-	if MLeft > 0 || MTop > 0 || MRight > 0 || MBot > 0 {
-		circleAnn.Margins = types.NewNumberArray(MLeft, MTop, MRight, MBot)
-	}
-
-	return circleAnn
+	_ = "STUB: not implemented"
+	return *new(CircleAnnotation)
 }
 
-// RenderDict renders ann into a page annotation dict.
 func (ann CircleAnnotation) RenderDict(xRefTable *XRefTable, pageIndRef *types.IndirectRef) (types.Dict, error) {
-	d, err := ann.MarkupAnnotation.RenderDict(xRefTable, pageIndRef)
-	if err != nil {
-		return nil, err
-	}
-
-	if ann.FillCol != nil {
-		d["IC"] = ann.FillCol.Array()
-	}
-
-	if ann.Margins != nil {
-		d["RD"] = ann.Margins
-	}
-
-	if ann.BorderWidth > 0 {
-		d["BS"] = borderStyleDict(ann.BorderWidth, ann.BorderStyle)
-	}
-
-	if ann.CloudyBorder && ann.CloudyBorderIntensity > 0 {
-		d["BE"] = borderEffectDict(ann.CloudyBorder, ann.CloudyBorderIntensity)
-	}
-
-	return d, nil
+	_ = "STUB: not implemented"
+	return *new(types.Dict), nil
 }
 
-// PolygonIntent represents the various polygon annotation intents.
 type PolygonIntent int
 
 const (
@@ -1251,33 +586,21 @@ const (
 	IntentPolygonDimension
 )
 
-// PolygonIntentName returns the string representation for pi.
-func PolygonIntentName(pi PolygonIntent) string {
-	var s string
-	switch pi {
-	case IntentPolygonCloud:
-		s = "PolygonCloud"
-	case IntentPolygonDimension:
-		s = "PolygonDimension"
-	}
-	return s
-}
+func PolygonIntentName(pi PolygonIntent) string { _ = "STUB: not implemented"; return "" }
 
-// PolygonAnnotation represents a polygon annotation.
 type PolygonAnnotation struct {
 	MarkupAnnotation
-	Vertices              types.Array // Array of numbers specifying the alternating horizontal and vertical coordinates, respectively, of each vertex, in default user space.
-	Path                  types.Array // Array of n arrays, each supplying the operands for a path building operator (m, l or c).
-	Intent                string      // Optional description of the intent of the polygon annotation.
-	Measure               types.Dict  // Optional measure dictionary that shall specify the scale and units that apply to the annotation.
+	Vertices              types.Array
+	Path                  types.Array
+	Intent                string
+	Measure               types.Dict
 	FillCol               *color.SimpleColor
 	BorderWidth           float64
 	BorderStyle           BorderStyle
 	CloudyBorder          bool
-	CloudyBorderIntensity int // 0,1,2
+	CloudyBorderIntensity int
 }
 
-// NewPolygonAnnotation returns a new polygon annotation.
 func NewPolygonAnnotation(
 	rect types.Rectangle,
 	apObjNr int,
@@ -1299,77 +622,15 @@ func NewPolygonAnnotation(
 	borderStyle BorderStyle,
 	cloudyBorder bool,
 	cloudyBorderIntensity int) PolygonAnnotation {
-
-	ma := NewMarkupAnnotation(AnnPolygon, rect, apObjNr, contents, id, modDate, f, col, 0, 0, 0, title, popupIndRef, ca, rc, subject)
-
-	polygonIntent := ""
-	if intent != nil {
-		polygonIntent = PolygonIntentName(*intent)
-	}
-
-	if cloudyBorderIntensity < 0 || cloudyBorderIntensity > 2 {
-		cloudyBorderIntensity = 0
-	}
-
-	polygonAnn := PolygonAnnotation{
-		MarkupAnnotation:      ma,
-		Vertices:              vertices,
-		Path:                  path,
-		Intent:                polygonIntent,
-		Measure:               measure,
-		FillCol:               fillCol,
-		BorderWidth:           borderWidth,
-		BorderStyle:           borderStyle,
-		CloudyBorder:          cloudyBorder,
-		CloudyBorderIntensity: cloudyBorderIntensity,
-	}
-
-	return polygonAnn
+	_ = "STUB: not implemented"
+	return *new(PolygonAnnotation)
 }
 
-// RenderDict renders ann into a PDF annotation dict.
 func (ann PolygonAnnotation) RenderDict(xRefTable *XRefTable, pageIndRef *types.IndirectRef) (types.Dict, error) {
-
-	d, err := ann.MarkupAnnotation.RenderDict(xRefTable, pageIndRef)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(ann.Measure) > 0 {
-		d["Measure"] = ann.Measure
-	}
-
-	if len(ann.Vertices) > 0 && len(ann.Path) > 0 {
-		return nil, errors.New("pdfcpu: PolygonAnnotation supports \"Vertices\" or \"Path\" only")
-	}
-
-	if len(ann.Vertices) > 0 {
-		d["Vertices"] = ann.Vertices
-	} else {
-		d["Path"] = ann.Path
-	}
-
-	if ann.Intent != "" {
-		d.InsertName("IT", ann.Intent)
-
-	}
-
-	if ann.FillCol != nil {
-		d["IC"] = ann.FillCol.Array()
-	}
-
-	if ann.BorderWidth > 0 {
-		d["BS"] = borderStyleDict(ann.BorderWidth, ann.BorderStyle)
-	}
-
-	if ann.CloudyBorder && ann.CloudyBorderIntensity > 0 {
-		d["BE"] = borderEffectDict(ann.CloudyBorder, ann.CloudyBorderIntensity)
-	}
-
-	return d, nil
+	_ = "STUB: not implemented"
+	return *new(types.Dict), nil
 }
 
-// PolyLineIntent represents the various polyline annotation intents.
 type PolyLineIntent int
 
 const (
@@ -1377,29 +638,20 @@ const (
 	IntentPolyLineDimension
 )
 
-// PolyLineIntentName returns the string representation for pi.
-func PolyLineIntentName(pi PolyLineIntent) string {
-	var s string
-	switch pi {
-	case IntentPolyLineDimension:
-		s = "PolyLineDimension"
-	}
-	return s
-}
+func PolyLineIntentName(pi PolyLineIntent) string { _ = "STUB: not implemented"; return "" }
 
 type PolyLineAnnotation struct {
 	MarkupAnnotation
-	Vertices    types.Array // Array of numbers specifying the alternating horizontal and vertical coordinates, respectively, of each vertex, in default user space.
-	Path        types.Array // Array of n arrays, each supplying the operands for a path building operator (m, l or c).
-	Intent      string      // Optional description of the intent of the polyline annotation.
-	Measure     types.Dict  // Optional measure dictionary that shall specify the scale and units that apply to the annotation.
+	Vertices    types.Array
+	Path        types.Array
+	Intent      string
+	Measure     types.Dict
 	FillCol     *color.SimpleColor
 	BorderWidth float64
 	BorderStyle BorderStyle
-	LineEndings types.Array // Optional array of two names that shall specify the line ending styles.
+	LineEndings types.Array
 }
 
-// NewPolyLineAnnotation returns a new polyline annotation.
 func NewPolyLineAnnotation(
 	rect types.Rectangle,
 	apObjNr int,
@@ -1421,76 +673,13 @@ func NewPolyLineAnnotation(
 	borderStyle BorderStyle,
 	beginLineEndingStyle *LineEndingStyle,
 	endLineEndingStyle *LineEndingStyle) PolyLineAnnotation {
-
-	ma := NewMarkupAnnotation(AnnPolyLine, rect, apObjNr, contents, id, modDate, f, col, 0, 0, 0, title, popupIndRef, ca, rc, subject)
-
-	polyLineIntent := ""
-	if intent != nil {
-		polyLineIntent = PolyLineIntentName(*intent)
-	}
-
-	polyLineAnn := PolyLineAnnotation{
-		MarkupAnnotation: ma,
-		Vertices:         vertices,
-		Path:             path,
-		Intent:           polyLineIntent,
-		Measure:          measure,
-		FillCol:          fillCol,
-		BorderWidth:      borderWidth,
-		BorderStyle:      borderStyle,
-	}
-
-	if beginLineEndingStyle != nil && endLineEndingStyle != nil {
-		polyLineAnn.LineEndings =
-			types.NewNameArray(
-				LineEndingStyleName(*beginLineEndingStyle),
-				LineEndingStyleName(*endLineEndingStyle),
-			)
-	}
-
-	return polyLineAnn
+	_ = "STUB: not implemented"
+	return *new(PolyLineAnnotation)
 }
 
-// RenderDict renders ann into a PDF annotation dict.
 func (ann PolyLineAnnotation) RenderDict(xRefTable *XRefTable, pageIndRef *types.IndirectRef) (types.Dict, error) {
-
-	d, err := ann.MarkupAnnotation.RenderDict(xRefTable, pageIndRef)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(ann.Measure) > 0 {
-		d["Measure"] = ann.Measure
-	}
-
-	if len(ann.Vertices) > 0 && len(ann.Path) > 0 {
-		return nil, errors.New("pdfcpu: PolyLineAnnotation supports \"Vertices\" or \"Path\" only")
-	}
-
-	if len(ann.Vertices) > 0 {
-		d["Vertices"] = ann.Vertices
-	} else {
-		d["Path"] = ann.Path
-	}
-
-	if ann.Intent != "" {
-		d.InsertName("IT", ann.Intent)
-
-	}
-
-	if ann.FillCol != nil {
-		d["IC"] = ann.FillCol.Array()
-	}
-
-	if ann.BorderWidth > 0 {
-		d["BS"] = borderStyleDict(ann.BorderWidth, ann.BorderStyle)
-	}
-
-	if len(ann.LineEndings) == 2 {
-		d["LE"] = ann.LineEndings
-	}
-
-	return d, nil
+	_ = "STUB: not implemented"
+	return *new(types.Dict), nil
 }
 
 type TextMarkupAnnotation struct {
@@ -1498,7 +687,6 @@ type TextMarkupAnnotation struct {
 	Quad types.QuadPoints
 }
 
-// NewTextMarkupAnnotation returns a new text markup annotation.
 func NewTextMarkupAnnotation(
 	subType AnnotationType,
 	rect types.Rectangle,
@@ -1516,34 +704,19 @@ func NewTextMarkupAnnotation(
 	rc, subject string,
 
 	quad types.QuadPoints) TextMarkupAnnotation {
-
-	ma := NewMarkupAnnotation(subType, rect, apObjNr, contents, id, modDate, f, col, borderRadX, borderRadY, borderWidth, title, popupIndRef, ca, rc, subject)
-
-	return TextMarkupAnnotation{
-		MarkupAnnotation: ma,
-		Quad:             quad,
-	}
+	_ = "STUB: not implemented"
+	return *new(TextMarkupAnnotation)
 }
 
-// RenderDict renders ann as dict.
 func (ann TextMarkupAnnotation) RenderDict(xRefTable *XRefTable, pageIndRef *types.IndirectRef) (types.Dict, error) {
-	d, err := ann.MarkupAnnotation.RenderDict(xRefTable, pageIndRef)
-	if err != nil {
-		return nil, err
-	}
-
-	if ann.Quad != nil {
-		d.Insert("QuadPoints", ann.Quad.Array())
-	}
-
-	return d, nil
+	_ = "STUB: not implemented"
+	return *new(types.Dict), nil
 }
 
 type HighlightAnnotation struct {
 	TextMarkupAnnotation
 }
 
-// NewHighlightAnnotation returns a new highlight annotation.
 func NewHighlightAnnotation(
 	rect types.Rectangle,
 	apObjNr int,
@@ -1560,17 +733,14 @@ func NewHighlightAnnotation(
 	rc, subject string,
 
 	quad types.QuadPoints) HighlightAnnotation {
-
-	return HighlightAnnotation{
-		NewTextMarkupAnnotation(AnnHighLight, rect, apObjNr, contents, id, modDate, f, col, borderRadX, borderRadY, borderWidth, title, popupIndRef, ca, rc, subject, quad),
-	}
+	_ = "STUB: not implemented"
+	return *new(HighlightAnnotation)
 }
 
 type UnderlineAnnotation struct {
 	TextMarkupAnnotation
 }
 
-// NewUnderlineAnnotation returns a new underline annotation.
 func NewUnderlineAnnotation(
 	rect types.Rectangle,
 	apObjNr int,
@@ -1587,17 +757,14 @@ func NewUnderlineAnnotation(
 	rc, subject string,
 
 	quad types.QuadPoints) UnderlineAnnotation {
-
-	return UnderlineAnnotation{
-		NewTextMarkupAnnotation(AnnUnderline, rect, apObjNr, contents, id, modDate, f, col, borderRadX, borderRadY, borderWidth, title, popupIndRef, ca, rc, subject, quad),
-	}
+	_ = "STUB: not implemented"
+	return *new(UnderlineAnnotation)
 }
 
 type SquigglyAnnotation struct {
 	TextMarkupAnnotation
 }
 
-// NewSquigglyAnnotation returns a new squiggly annotation.
 func NewSquigglyAnnotation(
 	rect types.Rectangle,
 	apObjNr int,
@@ -1614,17 +781,14 @@ func NewSquigglyAnnotation(
 	rc, subject string,
 
 	quad types.QuadPoints) SquigglyAnnotation {
-
-	return SquigglyAnnotation{
-		NewTextMarkupAnnotation(AnnSquiggly, rect, apObjNr, contents, id, modDate, f, col, borderRadX, borderRadY, borderWidth, title, popupIndRef, ca, rc, subject, quad),
-	}
+	_ = "STUB: not implemented"
+	return *new(SquigglyAnnotation)
 }
 
 type StrikeOutAnnotation struct {
 	TextMarkupAnnotation
 }
 
-// NewStrikeOutAnnotation returns a new strike out annotation.
 func NewStrikeOutAnnotation(
 	rect types.Rectangle,
 	apObjNr int,
@@ -1641,19 +805,16 @@ func NewStrikeOutAnnotation(
 	rc, subject string,
 
 	quad types.QuadPoints) StrikeOutAnnotation {
-
-	return StrikeOutAnnotation{
-		NewTextMarkupAnnotation(AnnStrikeOut, rect, apObjNr, contents, id, modDate, f, col, borderRadX, borderRadY, borderWidth, title, popupIndRef, ca, rc, subject, quad),
-	}
+	_ = "STUB: not implemented"
+	return *new(StrikeOutAnnotation)
 }
 
 type CaretAnnotation struct {
 	MarkupAnnotation
-	RD        *types.Rectangle // A set of four numbers that shall describe the numerical differences between two rectangles: the Rect entry of the annotation and the actual boundaries of the underlying caret.
-	Paragraph bool             // A new paragraph symbol (¶) shall be associated with the caret.
+	RD        *types.Rectangle
+	Paragraph bool
 }
 
-// NewCaretAnnotation returns a new caret annotation.
 func NewCaretAnnotation(
 	rect types.Rectangle,
 	apObjNr int,
@@ -1671,45 +832,24 @@ func NewCaretAnnotation(
 
 	rd *types.Rectangle,
 	paragraph bool) CaretAnnotation {
-
-	ma := NewMarkupAnnotation(AnnCaret, rect, apObjNr, contents, id, modDate, f, col, borderRadX, borderRadY, borderWidth, title, popupIndRef, ca, rc, subject)
-
-	return CaretAnnotation{
-		MarkupAnnotation: ma,
-		RD:               rd,
-		Paragraph:        paragraph,
-	}
+	_ = "STUB: not implemented"
+	return *new(CaretAnnotation)
 }
 
-// RenderDict renders ann as dict.
 func (ann CaretAnnotation) RenderDict(xRefTable *XRefTable, pageIndRef *types.IndirectRef) (types.Dict, error) {
-	d, err := ann.MarkupAnnotation.RenderDict(xRefTable, pageIndRef)
-	if err != nil {
-		return nil, err
-	}
-
-	if ann.RD != nil {
-		d["RD"] = ann.RD.Array()
-	}
-
-	if ann.Paragraph {
-		d["Sy"] = types.Name("P")
-	}
-
-	return d, nil
+	_ = "STUB: not implemented"
+	return *new(types.Dict), nil
 }
 
-// A series of alternating x and y coordinates in PDF user space, specifying points along the path.
 type InkPath []float64
 
 type InkAnnotation struct {
 	MarkupAnnotation
-	InkList     []InkPath // Array of n arrays, each representing a stroked path of points in user space.
+	InkList     []InkPath
 	BorderWidth float64
 	BorderStyle BorderStyle
 }
 
-// NewInkAnnotation returns a new ink annotation.
 func NewInkAnnotation(
 	rect types.Rectangle,
 	apObjNr int,
@@ -1725,33 +865,11 @@ func NewInkAnnotation(
 	ink []InkPath,
 	borderWidth float64,
 	borderStyle BorderStyle) InkAnnotation {
-
-	ma := NewMarkupAnnotation(AnnInk, rect, apObjNr, contents, id, modDate, f, col, 0, 0, 0, title, popupIndRef, ca, rc, subject)
-
-	return InkAnnotation{
-		MarkupAnnotation: ma,
-		InkList:          ink,
-		BorderWidth:      borderWidth,
-		BorderStyle:      borderStyle,
-	}
+	_ = "STUB: not implemented"
+	return *new(InkAnnotation)
 }
 
-// RenderDict renders ann as dict.
 func (ann InkAnnotation) RenderDict(xRefTable *XRefTable, pageIndRef *types.IndirectRef) (types.Dict, error) {
-	d, err := ann.MarkupAnnotation.RenderDict(xRefTable, pageIndRef)
-	if err != nil {
-		return nil, err
-	}
-
-	ink := types.Array{}
-	for i := range ann.InkList {
-		ink = append(ink, types.NewNumberArray(ann.InkList[i]...))
-	}
-	d["InkList"] = ink
-
-	if ann.BorderWidth > 0 {
-		d["BS"] = borderStyleDict(ann.BorderWidth, ann.BorderStyle)
-	}
-
-	return d, nil
+	_ = "STUB: not implemented"
+	return *new(types.Dict), nil
 }

@@ -1,549 +1,103 @@
-/*
-Copyright 2018 The pdfcpu Authors.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-	http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package types
 
-import (
-	"fmt"
-	"sort"
-	"strconv"
-	"strings"
-
-	"github.com/pdfcpu/pdfcpu/pkg/log"
-	"github.com/pkg/errors"
-)
-
-// Dict represents a PDF dict object.
 type Dict map[string]Object
 
-// NewDict returns a new PDFDict object.
-func NewDict() Dict {
-	return map[string]Object{}
-}
+func NewDict() Dict { _ = "STUB: not implemented"; return *new(Dict) }
 
-// Len returns the length of this PDFDict.
-func (d Dict) Len() int {
-	return len(d)
-}
+func (d Dict) Len() int { _ = "STUB: not implemented"; return 0 }
 
-// Clone returns a clone of d.
-func (d Dict) Clone() Object {
-	d1 := NewDict()
-	for k, v := range d {
-		if v != nil {
-			v = v.Clone()
-		}
-		d1.Insert(k, v)
-	}
-	return d1
-}
+func (d Dict) Clone() Object { _ = "STUB: not implemented"; return *new(Object) }
 
-// Insert adds a new entry to this PDFDict.
-func (d Dict) Insert(k string, v Object) bool {
-	if _, found := d.Find(k); !found {
-		d[k] = v
-		return true
-	}
-	return false
-}
+func (d Dict) Insert(k string, v Object) bool { _ = "STUB: not implemented"; return false }
 
-// InsertBool adds a new bool entry to this PDFDict.
-func (d Dict) InsertBool(key string, value bool) {
-	d.Insert(key, Boolean(value))
-}
+func (d Dict) InsertBool(key string, value bool) { _ = "STUB: not implemented"; return }
 
-// InsertInt adds a new int entry to this PDFDict.
-func (d Dict) InsertInt(key string, value int) {
-	d.Insert(key, Integer(value))
-}
+func (d Dict) InsertInt(key string, value int) { _ = "STUB: not implemented"; return }
 
-// InsertFloat adds a new float entry to this PDFDict.
-func (d Dict) InsertFloat(key string, value float32) {
-	d.Insert(key, Float(value))
-}
+func (d Dict) InsertFloat(key string, value float32) { _ = "STUB: not implemented"; return }
 
-// InsertString adds a new string entry to this PDFDict.
-func (d Dict) InsertString(key, value string) {
-	d.Insert(key, StringLiteral(value))
-}
+func (d Dict) InsertString(key, value string) { _ = "STUB: not implemented"; return }
 
-// InsertName adds a new name entry to this PDFDict.
-func (d Dict) InsertName(key, value string) {
-	d.Insert(key, Name(value))
-}
+func (d Dict) InsertName(key, value string) { _ = "STUB: not implemented"; return }
 
-// Update modifies an existing entry of this PDFDict.
-func (d Dict) Update(key string, value Object) {
-	if value != nil {
-		d[key] = value
-	}
-}
+func (d Dict) Update(key string, value Object) { _ = "STUB: not implemented"; return }
 
-// Find returns the Object for given key and PDFDict.
 func (d Dict) Find(key string) (Object, bool) {
-	v, found := d[key]
-	if found {
-		return v, found
-	}
-	for n, v := range d {
-		k, err := DecodeName(n)
-		if err != nil {
-			return nil, false
-		}
-		if k == key {
-			return v, true
-		}
-	}
-	return nil, false
+	_ = "STUB: not implemented"
+	return *new(Object), false
 }
 
-// Delete deletes the Object for given key.
-func (d Dict) Delete(key string) (value Object) {
-	value, found := d.Find(key)
-	if !found {
-		return nil
-	}
-	// TODO Take encoded names into account.
-	delete(d, key)
-	return value
-}
+func (d Dict) Delete(key string) (value Object) { _ = "STUB: not implemented"; return *new(Object) }
 
-// NewIDForPrefix returns next id with prefix.
-func (d Dict) NewIDForPrefix(prefix string, i int) string {
-	var id string
-	found := true
-	for j := i; found; j++ {
-		id = prefix + strconv.Itoa(j)
-		_, found = d.Find(id)
-	}
-	return id
-}
+func (d Dict) NewIDForPrefix(prefix string, i int) string { _ = "STUB: not implemented"; return "" }
 
-// Entry returns the value for a given key and if the entry was found.
 func (d Dict) Entry(dictName, key string, required bool) (Object, bool, error) {
-	obj, found := d.Find(key)
-	if !found {
-		if required {
-			return nil, false, errors.Errorf("dict=%s required entry=%s missing", dictName, key)
-		}
-		return nil, false, nil
-	}
-
-	if obj == nil {
-		if required {
-			return nil, true, errors.Errorf("dict=%s required entry=%s corrupt", dictName, key)
-		}
-	}
-
-	return obj, found, nil
+	_ = "STUB: not implemented"
+	return *new(Object), false, nil
 }
 
-// BooleanEntry expects and returns a BooleanEntry for given key.
-func (d Dict) BooleanEntry(key string) *bool {
+func (d Dict) BooleanEntry(key string) *bool { _ = "STUB: not implemented"; return nil }
 
-	value, found := d.Find(key)
-	if !found {
-		return nil
-	}
+func (d Dict) StringEntry(key string) *string { _ = "STUB: not implemented"; return nil }
 
-	bb, ok := value.(Boolean)
-	if ok {
-		b := bb.Value()
-		return &b
-	}
+func (d Dict) NameEntry(key string) *string { _ = "STUB: not implemented"; return nil }
 
-	return nil
-}
+func (d Dict) IntEntry(key string) *int { _ = "STUB: not implemented"; return nil }
 
-// StringEntry expects and returns a StringLiteral entry for given key.
-func (d Dict) StringEntry(key string) *string {
+func (d Dict) Int64Entry(key string) *int64 { _ = "STUB: not implemented"; return nil }
 
-	value, found := d.Find(key)
-	if !found {
-		return nil
-	}
+func (d Dict) IndirectRefEntry(key string) *IndirectRef { _ = "STUB: not implemented"; return nil }
 
-	pdfStr, ok := value.(StringLiteral)
-	if ok {
-		s := string(pdfStr)
-		return &s
-	}
+func (d Dict) DictEntry(key string) Dict { _ = "STUB: not implemented"; return *new(Dict) }
 
-	return nil
-}
+func (d Dict) StreamDictEntry(key string) *StreamDict { _ = "STUB: not implemented"; return nil }
 
-// NameEntry expects and returns a Name entry for given key.
-func (d Dict) NameEntry(key string) *string {
+func (d Dict) ArrayEntry(key string) Array { _ = "STUB: not implemented"; return *new(Array) }
 
-	value, found := d.Find(key)
-	if !found {
-		return nil
-	}
+func (d Dict) StringLiteralEntry(key string) *StringLiteral { _ = "STUB: not implemented"; return nil }
 
-	name, ok := value.(Name)
-	if ok {
-		s := name.Value()
-		return &s
-	}
+func (d Dict) HexLiteralEntry(key string) *HexLiteral { _ = "STUB: not implemented"; return nil }
 
-	return nil
-}
-
-// IntEntry expects and returns a Integer entry for given key.
-func (d Dict) IntEntry(key string) *int {
-
-	value, found := d.Find(key)
-	if !found {
-		return nil
-	}
-
-	pdfInt, ok := value.(Integer)
-	if ok {
-		i := int(pdfInt)
-		return &i
-	}
-
-	return nil
-}
-
-// Int64Entry expects and returns a Integer entry representing an int64 value for given key.
-func (d Dict) Int64Entry(key string) *int64 {
-
-	value, found := d.Find(key)
-	if !found {
-		return nil
-	}
-
-	pdfInt, ok := value.(Integer)
-	if ok {
-		i := int64(pdfInt)
-		return &i
-	}
-
-	return nil
-}
-
-// IndirectRefEntry returns an indirectRefEntry for given key for this dictionary.
-func (d Dict) IndirectRefEntry(key string) *IndirectRef {
-
-	value, found := d.Find(key)
-	if !found {
-		return nil
-	}
-
-	pdfIndRef, ok := value.(IndirectRef)
-	if ok {
-		return &pdfIndRef
-	}
-
-	// return err?
-	return nil
-}
-
-// DictEntry expects and returns a PDFDict entry for given key.
-func (d Dict) DictEntry(key string) Dict {
-
-	value, found := d.Find(key)
-	if !found {
-		return nil
-	}
-
-	// TODO resolve indirect ref.
-
-	d, ok := value.(Dict)
-	if ok {
-		return d
-	}
-
-	return nil
-}
-
-// StreamDictEntry expects and returns a StreamDict entry for given key.
-// unused.
-func (d Dict) StreamDictEntry(key string) *StreamDict {
-
-	value, found := d.Find(key)
-	if !found {
-		return nil
-	}
-
-	sd, ok := value.(StreamDict)
-	if ok {
-		return &sd
-	}
-
-	return nil
-}
-
-// ArrayEntry expects and returns a Array entry for given key.
-func (d Dict) ArrayEntry(key string) Array {
-
-	value, found := d.Find(key)
-	if !found {
-		return nil
-	}
-
-	a, ok := value.(Array)
-	if ok {
-		return a
-	}
-
-	return nil
-}
-
-// StringLiteralEntry returns a StringLiteral object for given key.
-func (d Dict) StringLiteralEntry(key string) *StringLiteral {
-
-	value, found := d.Find(key)
-	if !found {
-		return nil
-	}
-
-	s, ok := value.(StringLiteral)
-	if ok {
-		return &s
-	}
-
-	return nil
-}
-
-// HexLiteralEntry returns a HexLiteral object for given key.
-func (d Dict) HexLiteralEntry(key string) *HexLiteral {
-
-	value, found := d.Find(key)
-	if !found {
-		return nil
-	}
-
-	s, ok := value.(HexLiteral)
-	if ok {
-		return &s
-	}
-
-	return nil
-}
-
-// StringOrHexLiteralEntry string or hex literal entry.
 func (d Dict) StringOrHexLiteralEntry(key string) (*string, error) {
-	if obj, ok := d.Find(key); ok {
-		return StringOrHexLiteral(obj)
-	}
+	_ = "STUB: not implemented"
 	return nil, nil
 }
 
-// Length returns a *int64 for entry with key "Length".
-// Stream length may be referring to an indirect object.
-func (d Dict) Length() (*int64, *int) {
+func (d Dict) Length() (*int64, *int) { _ = "STUB: not implemented"; return nil, nil }
 
-	val := d.Int64Entry("Length")
-	if val != nil {
-		return val, nil
-	}
+func (d Dict) Type() *string { _ = "STUB: not implemented"; return nil }
 
-	indirectRef := d.IndirectRefEntry("Length")
-	if indirectRef == nil {
-		return nil, nil
-	}
+func (d Dict) Subtype() *string { _ = "STUB: not implemented"; return nil }
 
-	intVal := indirectRef.ObjectNumber.Value()
+func (d Dict) Size() *int { _ = "STUB: not implemented"; return nil }
 
-	return nil, &intVal
-}
+func (d Dict) IsPage() bool { _ = "STUB: not implemented"; return false }
 
-// Type returns the value of the name entry for key "Type".
-func (d Dict) Type() *string {
-	return d.NameEntry("Type")
-}
+func (d Dict) IsObjStm() bool { _ = "STUB: not implemented"; return false }
 
-// Subtype returns the value of the name entry for key "Subtype".
-func (d Dict) Subtype() *string {
-	return d.NameEntry("Subtype")
-}
+func (d Dict) W() Array { _ = "STUB: not implemented"; return *new(Array) }
 
-// Size returns the value of the int entry for key "Size"
-func (d Dict) Size() *int {
-	return d.IntEntry("Size")
-}
+func (d Dict) Prev() *int64 { _ = "STUB: not implemented"; return nil }
 
-// IsPage reports whether page.
-func (d Dict) IsPage() bool {
-	return d.Type() != nil && *d.Type() == "Page"
-}
+func (d Dict) Index() Array { _ = "STUB: not implemented"; return *new(Array) }
 
-// IsObjStm returns true if given PDFDict is an object stream.
-func (d Dict) IsObjStm() bool {
-	return d.Type() != nil && *d.Type() == "ObjStm"
-}
+func (d Dict) N() *int { _ = "STUB: not implemented"; return nil }
 
-// W returns a *Array for key "W".
-func (d Dict) W() Array {
-	return d.ArrayEntry("W")
-}
+func (d Dict) First() *int { _ = "STUB: not implemented"; return nil }
 
-// Prev returns the previous offset.
-func (d Dict) Prev() *int64 {
-	return d.Int64Entry("Prev")
-}
+func (d Dict) IsLinearizationParmDict() bool { _ = "STUB: not implemented"; return false }
 
-// Index returns a *Array for key "Index".
-func (d Dict) Index() Array {
-	return d.ArrayEntry("Index")
-}
+func (d *Dict) IncrementBy(key string, i int) error { _ = "STUB: not implemented"; return nil }
 
-// N returns a *int for key "N".
-func (d Dict) N() *int {
-	return d.IntEntry("N")
-}
+func (d *Dict) Increment(key string) error { _ = "STUB: not implemented"; return nil }
 
-// First returns a *int for key "First".
-func (d Dict) First() *int {
-	return d.IntEntry("First")
-}
+func (d Dict) indentedString(level int) string { _ = "STUB: not implemented"; return "" }
 
-// IsLinearizationParmDict returns true if this dict has an int entry for key "Linearized".
-func (d Dict) IsLinearizationParmDict() bool {
-	return d.IntEntry("Linearized") != nil
-}
+func (d Dict) PDFString() string { _ = "STUB: not implemented"; return "" }
 
-// IncrementBy increments the integer value for given key by i.
-func (d *Dict) IncrementBy(key string, i int) error {
-	v := d.IntEntry(key)
-	if v == nil {
-		return errors.Errorf("IncrementBy: unknown key: %s", key)
-	}
-	*v += i
-	d.Update(key, Integer(*v))
-	return nil
-}
+func (d Dict) String() string { _ = "STUB: not implemented"; return "" }
 
-// Increment increments the integer value for given key.
-func (d *Dict) Increment(key string) error {
-	return d.IncrementBy(key, 1)
-}
-
-func (d Dict) indentedString(level int) string {
-
-	logstr := []string{"<<\n"}
-	tabstr := strings.Repeat("\t", level)
-
-	var keys []string
-	for k := range d {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-
-	for _, k := range keys {
-
-		v := d[k]
-
-		switch v := v.(type) {
-		case Dict:
-			dictStr := v.indentedString(level + 1)
-			logstr = append(logstr, fmt.Sprintf("%s<%s, %s>\n", tabstr, k, dictStr))
-		case Array:
-			arrStr := v.indentedString(level + 1)
-			logstr = append(logstr, fmt.Sprintf("%s<%s, %s>\n", tabstr, k, arrStr))
-		default:
-			val := "null"
-			if v != nil {
-				val = v.String()
-				if n, ok := v.(Name); ok {
-					val, _ = DecodeName(string(n))
-				}
-			}
-
-			logstr = append(logstr, fmt.Sprintf("%s<%s, %v>\n", tabstr, k, val))
-		}
-	}
-
-	logstr = append(logstr, fmt.Sprintf("%s%s", strings.Repeat("\t", level-1), ">>"))
-
-	return strings.Join(logstr, "")
-}
-
-// PDFString returns a string representation as found in and written to a PDF file.
-func (d Dict) PDFString() string {
-
-	logstr := []string{} //make([]string, 20)
-	logstr = append(logstr, "<<")
-
-	var keys []string
-	for k := range d {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-
-	for _, k := range keys {
-
-		v := d[k]
-		keyName := EncodeName(k)
-
-		switch v := v.(type) {
-		case nil:
-			logstr = append(logstr, fmt.Sprintf("/%s null", keyName))
-		case Dict:
-			logstr = append(logstr, fmt.Sprintf("/%s%s", keyName, v.PDFString()))
-		case Array:
-			logstr = append(logstr, fmt.Sprintf("/%s%s", keyName, v.PDFString()))
-		case IndirectRef:
-			logstr = append(logstr, fmt.Sprintf("/%s %s", keyName, v.PDFString()))
-		case Name:
-			logstr = append(logstr, fmt.Sprintf("/%s%s", keyName, v.PDFString()))
-		case Integer:
-			logstr = append(logstr, fmt.Sprintf("/%s %s", keyName, v.PDFString()))
-		case Float:
-			logstr = append(logstr, fmt.Sprintf("/%s %s", keyName, v.PDFString()))
-		case Boolean:
-			logstr = append(logstr, fmt.Sprintf("/%s %s", keyName, v.PDFString()))
-		case StringLiteral:
-			logstr = append(logstr, fmt.Sprintf("/%s%s", keyName, v.PDFString()))
-		case HexLiteral:
-			logstr = append(logstr, fmt.Sprintf("/%s%s", keyName, v.PDFString()))
-		default:
-			if log.InfoEnabled() {
-				log.Info.Fatalf("PDFDict.PDFString(): entry of unknown object type: %T %[1]v\n", v)
-			}
-		}
-	}
-
-	logstr = append(logstr, ">>")
-	return strings.Join(logstr, "")
-}
-
-// String returns the string value of d.
-func (d Dict) String() string {
-	return d.indentedString(1)
-}
-
-// StringEntryBytes returns the byte slice representing the string value for key.
 func (d Dict) StringEntryBytes(key string) ([]byte, error) {
-
-	s := d.StringLiteralEntry(key)
-	if s != nil {
-		bb, err := Unescape(s.Value())
-		if err != nil {
-			return nil, err
-		}
-		return bb, nil
-	}
-
-	h := d.HexLiteralEntry(key)
-	if h != nil {
-		return h.Bytes()
-	}
-
+	_ = "STUB: not implemented"
 	return nil, nil
 }

@@ -1,28 +1,7 @@
-/*
-Copyright 2025 The pdfcpu Authors.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-	http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package main
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/pdfcpu/pdfcpu/pkg/log"
 	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/model"
-	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/types"
 	"github.com/spf13/cobra"
 )
 
@@ -30,7 +9,7 @@ var (
 	conf             string
 	force            bool
 	kpw              string
-	needStackTrace   bool //= true
+	needStackTrace   bool
 	offline          bool
 	offlineSet       bool
 	opw              string
@@ -53,10 +32,7 @@ It is built on a Go API for direct PDF control.`,
 	SilenceErrors: true,
 }
 
-// Execute runs the root command.
-func Execute() error {
-	return rootCmd.Execute()
-}
+func Execute() error { _ = "STUB: not implemented"; return nil }
 
 func init() {
 	cobra.OnInitialize(initConfig)
@@ -68,164 +44,15 @@ func init() {
 	rootCmd.AddCommand(commands()...)
 }
 
-func commands() []*cobra.Command {
-	return []*cobra.Command{
-		// Document commands.
-		validateCmd(),
-		optimizeCmd(),
-		infoCmd(),
-		dumpCmd(),
-		createCmd(),
-		mergeCmd(),
-		splitCmd(),
-		trimCmd(),
-		collectCmd(),
+func commands() []*cobra.Command { _ = "STUB: not implemented"; return nil }
 
-		// Page commands.
-		pagesCmd(),
-		rotateCmd(),
-		nupCmd(),
-		gridCmd(),
-		bookletCmd(),
-		resizeCmd(),
-		posterCmd(),
-		ndownCmd(),
-		cutCmd(),
-		cropCmd(),
-		zoomCmd(),
-		boxesCmd(),
+func initConfig() { _ = "STUB: not implemented"; return }
 
-		// Content commands.
-		watermarkCmd(),
-		stampCmd(),
-		annotationsCmd(),
-		bookmarksCmd(),
-		pagemodeCmd(),
-		pagelayoutCmd(),
-		viewerprefCmd(),
-
-		// Resource commands.
-		importCmd(),
-		fontsCmd(),
-		imagesCmd(),
-		attachmentsCmd(),
-		portfolioCmd(),
-		keywordsCmd(),
-		propertiesCmd(),
-
-		// Extract commands.
-		extractCmd(),
-
-		// Form commands.
-		formCmd(),
-
-		// Security commands.
-		encryptCmd(),
-		decryptCmd(),
-		changeupwCmd(),
-		changeopwCmd(),
-		permissionsCmd(),
-
-		// Trust and signature commands.
-		certificatesCmd(),
-		signaturesCmd(),
-
-		// Support commands.
-		completionCmd(),
-		configCmd(),
-		paperCmd(),
-		selectedpagesCmd(),
-		versionCmd(),
-	}
-}
-
-func initConfig() {
-
-	if verbose > 2 {
-		verbose = 2
-	}
-
-	needStackTrace = verbose > 0
-
-	if quiet {
-		return
-	}
-
-	log.SetDefaultCLILogger()
-
-	//log.SetDefaultParseLogger()
-
-	if verbose > 0 {
-		log.SetDefaultDebugLogger()
-		log.SetDefaultInfoLogger()
-		log.SetDefaultStatsLogger()
-	}
-
-	if verbose == 2 {
-		log.SetDefaultTraceLogger()
-		log.SetDefaultReadLogger()
-		log.SetDefaultValidateLogger()
-		log.SetDefaultOptimizeLogger()
-		log.SetDefaultWriteLogger()
-	}
-}
-
-func validateConfigDirFlag() error {
-	if len(conf) > 0 && conf != "disable" {
-		info, err := os.Stat(conf)
-		if err != nil {
-			if os.IsNotExist(err) {
-				return fmt.Errorf("conf: %s does not exist", conf)
-			}
-			return fmt.Errorf("conf: %s %v", conf, err)
-		}
-		if !info.IsDir() {
-			return fmt.Errorf("conf: %s not a directory", conf)
-		}
-		model.ConfigPath = conf
-		return nil
-	}
-	if conf == "disable" {
-		model.ConfigPath = "disable"
-	}
-	return nil
-}
+func validateConfigDirFlag() error { _ = "STUB: not implemented"; return nil }
 
 func ensureDefaultConfig() (*model.Configuration, error) {
-	if err := validateConfigDirFlag(); err != nil {
-		return nil, err
-	}
-
-	// Check if offline flag was explicitly set
-	if cmd := rootCmd; cmd != nil {
-		if f := cmd.Flag("offline"); f != nil {
-			offlineSet = f.Changed
-		}
-	}
-
-	if !types.MemberOf(model.ConfigPath, []string{"default", "disable"}) {
-		if err := model.EnsureDefaultConfigAt(model.ConfigPath, false); err != nil {
-			return nil, err
-		}
-	}
-	return model.NewDefaultConfiguration(), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func getConfig() (*model.Configuration, error) {
-	conf, err := ensureDefaultConfig()
-	if err != nil {
-		return nil, fmt.Errorf("pdfcpu: %v", err)
-	}
-
-	conf.OwnerPW = opw
-	conf.UserPW = upw
-	conf.PrivateKeyPW = kpw
-	conf.RemoveSignatures = removeSignatures
-	conf.RemoveEncryption = removeEncryption
-
-	if offlineSet {
-		conf.Offline = offline
-	}
-
-	return conf, nil
-}
+func getConfig() (*model.Configuration, error) { _ = "STUB: not implemented"; return nil, nil }
